@@ -2,6 +2,11 @@ import pygame
 from pygame.draw import *
 
 
+import pygame
+from pygame.draw import *
+
+
+# Данная функция рисует ногу ламы, координаты на входе - координаты центра верхнего эллипса
 def leg(screen: pygame.display, cord_x: int, cord_y: int, size: float,
         colour_body: tuple):
     ellipse(screen, colour_body, (round(cord_x - size * 10), round(cord_y - size * 24),
@@ -12,6 +17,8 @@ def leg(screen: pygame.display, cord_x: int, cord_y: int, size: float,
                                   round(size * 2 * 10), round(size * 2 * 7)))
 
 
+# Данная функция рисует глаз ламы, координаты на входе такие же, как и у самой ламы
+# (центр основного эллипса тела)
 def eye(screen: pygame.display, cord_x: int, cord_y: int, size: float,
         colour_body: tuple, colour_eye_1: tuple, colour_eye_2: tuple):
     ellipse(screen, colour_eye_2,
@@ -26,6 +33,7 @@ def eye(screen: pygame.display, cord_x: int, cord_y: int, size: float,
     screen.blit(surface_rot, (cord_x + round(size * 58), cord_y - round(size * 138)))
 
 
+# Данная функция рисует тело ламы (вместе с шеей и головой), координаты на вход - центр эллипса самого тела
 def body(screen: pygame.display, cord_x: int, cord_y: int, size: float,
          colour_body: tuple):
     ellipse(screen, colour_body,
@@ -39,6 +47,8 @@ def body(screen: pygame.display, cord_x: int, cord_y: int, size: float,
              round(size * 2 * 24), round(size * 2 * 16)))
 
 
+# Данная функция рисует уши ламы в виде двух парабол. Координаты на вход - такие же, как и у большинства предыдущих
+# функций
 def ears(screen: pygame.display, cord_x: int, cord_y: int, size: float,
          colour_body: tuple):
     ear_1_points_1 = []
@@ -65,6 +75,8 @@ def ears(screen: pygame.display, cord_x: int, cord_y: int, size: float,
     screen.blit(surface_2, [round(cord_x + size * 33), round(cord_y - size * 147)])
 
 
+# Данная функция рисут целую ламу. Координаты на вход такие же, как и у большинства предыдущих функций. Также можно
+# задать размер относительно размера ламы в боевом задании и цвета для разных частей ламы
 def llama(screen: pygame.display, cord_x: int, cord_y: int, size: float,
           colour_body: tuple, colour_eye_1: tuple, colour_eye_2: tuple):
     ears(screen, cord_x, cord_y, size, colour_body)
@@ -79,6 +91,9 @@ def llama(screen: pygame.display, cord_x: int, cord_y: int, size: float,
     eye(screen, cord_x, cord_y, size, colour_body, colour_eye_1, colour_eye_2)
 
 
+# Данная функция рисует цветы, которые можно поворачивать на угол angle, задать ему размер относительно размера цветков
+# в боевом задании. Также можно задать цвета центра цветка, лепестков и каймы вокруг них. Ещё функция на вход принимает
+# координаты центра цветка
 def flower(screen: pygame.display, cord_x: int, cord_y: int, size: float, angle: float,
            colour_flower_1: tuple, colour_flower_2: tuple, colour_flower_3: tuple):
     surface = pygame.Surface((round(size * 49), round(size * 26)), pygame.SRCALPHA)
@@ -109,7 +124,7 @@ def flower(screen: pygame.display, cord_x: int, cord_y: int, size: float, angle:
     ellipse(surface, colour_flower_1, (round(size * 22 - size * 8), round(size * 16 - size * 5),
                                        round(size * 2 * 8), round(size * 2 * 5)))
     ellipse(surface, colour_flower_3, (round(size * 22 - size * 8), round(size * 16 - size * 5),
-                                       round(size * 2 * 8), round(size * 2 * 5)), round(size ))
+                                       round(size * 2 * 8), round(size * 2 * 5)), round(size))
 
     ellipse(surface, colour_flower_1, (round(size * 30 - size * 8), round(size * 15 - size * 5),
                                        round(size * 2 * 8), round(size * 2 * 5)))
@@ -120,20 +135,23 @@ def flower(screen: pygame.display, cord_x: int, cord_y: int, size: float, angle:
     screen.blit(surface_rot, (cord_x - round(size * 27), cord_y - round(size * 13)))
 
 
+# Данная функция принимает на вход координаты центра куста, а также его размеры относительно кустов из боевого задания
 def bush(screen: pygame.display, cord_x: int, cord_y: int, size: float,
          colour_bush: tuple, colour_flower_1: tuple, colour_flower_2: tuple, colour_flower_3: tuple):
     ellipse(screen, colour_bush, (cord_x - round(size * 115), cord_y - round(size * 115),
                                   round(size * 2 * 115), round(size * 2 * 115)))
-    flower(screen, cord_x + round(size * 10), cord_y - round(size * 60), size + 1, 0,
+    flower(screen, cord_x + round(size * 10), cord_y - round(size * 60), size + 0.5, 0,
            colour_flower_1, colour_flower_2, colour_flower_3)
     flower(screen, cord_x - round(size * 65), cord_y - round(size * 30), size + 0.5, 20,
            colour_flower_1, colour_flower_2, colour_flower_3)
-    flower(screen, cord_x - round(size * 55), cord_y + round(size * 10), size + 1, 30,
+    flower(screen, cord_x - round(size * 55), cord_y + round(size * 10), size + 0.5, 30,
            colour_flower_1, colour_flower_2, colour_flower_3)
-    flower(screen, cord_x + round(size * 15), cord_y + round(size * 40), size + 1, -30,
+    flower(screen, cord_x + round(size * 15), cord_y + round(size * 40), size + 0.5, -30,
            colour_flower_1, colour_flower_2, colour_flower_3)
-    flower(screen, cord_x + round(size * 60), cord_y - round(size * 20), size + 1, -50,
+    flower(screen, cord_x + round(size * 60), cord_y - round(size * 20), size + 0.5, -50,
            colour_flower_1, colour_flower_2, colour_flower_3)
+
+
 
 
 def main():
