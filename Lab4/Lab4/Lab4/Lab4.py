@@ -1,7 +1,6 @@
 import linecache
 import json
 import pygame
-import sys
 from math import sqrt
 from pygame.draw import *
 from random import randint
@@ -131,14 +130,14 @@ while not finished:
                 if number_of_symbol != 0 and number_of_enter == 0:
                     nickname = nickname[:-1]
                     number_of_symbol = number_of_symbol - 1
-                    rect(screen, (0, 0, 0), (425 + number_of_symbol * 25, 450, 50, 50))
+                    rect(screen, (0, 0, 0), (430 + number_of_symbol * 30, 450, 50, 50))
             else:
                 keyname = pygame.key.name(event.key)
                 nickname = nickname + keyname
                 f1 = pygame.font.Font(None, 50)
                 number_of_symbol = number_of_symbol + 1
                 text1 = f1.render(keyname, True, (180, 0, 0))
-                screen.blit(text1, (400 + number_of_symbol * 25, 450))
+                screen.blit(text1, (400 + number_of_symbol * 30, 450))
 
 
 
