@@ -5,10 +5,6 @@ from random import randint
 import pygame
 from pygame.draw import *
 pygame.init()
-"""
- linecache needed to read a specific line
- json needed to save the list to a file
-"""
 
 FPS = 90
 LENGHT = 1200
