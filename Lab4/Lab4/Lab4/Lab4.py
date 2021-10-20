@@ -1,15 +1,19 @@
 import linecache
-import json
-import pygame
+import json 
 from math import sqrt
-from pygame.draw import *
 from random import randint
+import pygame
+from pygame.draw import *
 pygame.init()
+"""
+ linecache needed to read a specific line
+ json needed to save the list to a file
+"""
 
 FPS = 90
-length = 1200
-width = 900
-screen = pygame.display.set_mode((length, width))
+LENGHT = 1200
+WIDTH = 900
+screen = pygame.display.set_mode((LENGHT, WIDTH))
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -21,6 +25,12 @@ BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 class Ball:
+    """ A ball is being created
+    number_of_clicks_to_delete - Number of taps to remove the ball
+    lives - Number of lives
+    x, y, r  - Coordinates of the center of the ball and radius
+    v - Speed
+    """
     def __init__(self):
         self.max_r = 99
         self.number_of_clicks_to_delete = randint(1, 5)
@@ -32,6 +42,9 @@ class Ball:
         self.v = (randint(-6, 6), randint(-6, 6))
 
     def moving(self):
+        """
+        Moving the ball
+        """
         self.x = self.x + self.v[0]
         self.y = self.y + self.v[1]
         if self.x > 1200 - self.r or self.x - self.r < 0:
@@ -42,85 +55,91 @@ class Ball:
             self.v = vx, -vy
 
     def draw(self):
+        """
+        A ball is being drawn
+        """
         circle(screen, self.color, (self.x, self.y), self.r)
 
     def delete(self):
+        """
+        The ball is painted black before being removed
+        """
         self.color = BLACK
 
 def number(num):
-
-    A = []
+    """
+    Displays the score in the game on the screen
+    """
+    numbers = []
     if num == 0:
-        A.append(0)
+        numbers.append(0)
     while num != 0:
-        A.append(num % 10)
+        numbers.append(num % 10)
         num = num // 10
 
-    for k in reversed(range(len(A))):
-        C = linecache.getline('num.txt', A[k] + 1)
-        posx = length - 100 - 120 * k
+    for k in reversed(range(len(numbers))):
+        font_information = linecache.getline('num.txt', numbers[k] + 1)
+        posx = LENGHT - 100 - 120 * k
         posy = 150
         tempx = posx
         tempy = posy
-        Numbe_of_numbers_read = 0
+        numbe_of_numbers_read = 0
 
-        for i in range(len(C)):
-            if C[i] == '(':
-                i = i + 1
+        for j in range(len(font_information)):
+            if font_information[j] == '(':
+                j = j + 1
                 x = 0
                 y = 0
-                while C[i] != ',':
-                    x = x * 10 + ord(C[i]) - ord('0')
-                    i = i + 1
-                Numbe_of_numbers_read = Numbe_of_numbers_read + 1
- 
-                i = i + 1;
-                while C[i] != ')':
-                    y = y * 10 + ord(C[i]) - ord('0')
-                    i = i + 1
-                Numbe_of_numbers_read = Numbe_of_numbers_read + 1
-
-                if Numbe_of_numbers_read == 2:
+                while font_information[j] != ',':
+                    x = x * 10 + ord(font_information[j]) - ord('0')
+                    j = j + 1
+                numbe_of_numbers_read = numbe_of_numbers_read + 1 
+                j = j + 1
+                while font_information[j] != ')':
+                    y = y * 10 + ord(font_information[j]) - ord('0')
+                    j = j + 1
+                numbe_of_numbers_read = numbe_of_numbers_read + 1
+                if numbe_of_numbers_read == 2:
                     tempx = tempx + x
                     tempy = tempy - y
                 else:
-                    line(screen, (255, 255, 255), (tempx, tempy), (posx + x, posy - y), 10)
+                    line(screen, (255, 255, 255), (tempx, tempy),
+                        (posx + x, posy - y), 10)
                     tempx = posx + x
-                    tempy = posy - y
-
-  
+                    tempy = posy - y  
 pygame.display.update()
 clock = pygame.time.Clock()
 
 data = {}
-with open ('input.json') as f:
+with open ('input.json', 'r') as f:
     data = json.load(f)
 
-finished = False
+FINISHED = False
 nickname = ''
 number_of_symbol = 0
 number_of_enter = 0
-while not finished:
+while not FINISHED:
     f2 = pygame.font.Font(None, 50)
     text2 = f2.render('Plese, enter your nickname:', True, (180, 0, 0))
     screen.blit(text2, (400 , 400))
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            finished = True
+            FINISHED = True
         elif event.type == pygame.KEYDOWN:
             if pygame.key.name(event.key) == 'escape':
-                finished = True
+                FINISHED = True
             elif pygame.key.name(event.key) == 'return':
                 if number_of_enter == 0:
                     if data.get(nickname) == None:
-                       data[nickname] = 0
-                    text3 = f2.render('Your record:' + str(data[nickname]), True, (180, 0, 0))
+                        data[nickname] = 0
+                    text3 = f2.render('Your record:' + str(data[nickname]),
+                                     True, (180, 0, 0))
                     screen.blit(text3, (400, 500))
                     number_of_enter = number_of_enter + 1
                 else:
                     number_of_enter = number_of_enter + 1
-                    finished = True
+                    FINISHED = True
             elif pygame.key.name(event.key) == 'space':
                 number_of_symbol = number_of_symbol + 1
                 nickname = nickname + ' '
@@ -142,7 +161,7 @@ while not finished:
 
 
 if number_of_enter == 2:
-    finished = False
+    FINISHED = False
 
 
 
@@ -150,8 +169,8 @@ list_of_balls = []
 score = 0
 number_of_while = 0
 
-while not finished:
-    number_of_while = number_of_while + 1;
+while not FINISHED:
+    number_of_while = number_of_while + 1
 
     clock.tick(FPS)
 
@@ -169,12 +188,12 @@ while not finished:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            finished = True
+            FINISHED = True
         elif event.type == pygame.KEYDOWN:
             if pygame.key.name(event.key) == 'escape':
-                finished = True
+                FINISHED = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            the_number_of_balls_hit = 0;
+            the_number_of_balls_hit = 0
             for i in reversed(range(len(list_of_balls))):
                 if (event.pos[0] - list_of_balls[i].x) ** 2 + (event.pos[1] - list_of_balls[i].y) ** 2 < list_of_balls[i].r ** 2:
                     the_number_of_balls_hit = the_number_of_balls_hit + 1
@@ -209,14 +228,11 @@ if score > data[nickname]:
                 finished = True
             elif event.type == pygame.KEYDOWN:
                 if pygame.key.name(event.key) == 'escape':
-                    finished = True
+                    FINISHED = True
         f4 = pygame.font.Font(None, 50)
-        text4 = f4.render('Congratulations! You have a new record:' + ' ' +str(score), True, (180, 0, 0))
+        text4 = f4.render('Congratulations! You have a new record:' + ' ' +str(score),
+                         True, (180, 0, 0))
         screen.blit(text4, (350 , 400))
         pygame.display.update()
         
-     
-
-            
-
 pygame.quit()
