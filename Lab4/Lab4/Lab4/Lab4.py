@@ -119,6 +119,9 @@ nickname = ''
 number_of_symbol = 0
 number_of_enter = 0
 while not FINISHED:
+    """
+    Entering the user name
+    """
     f2 = pygame.font.Font(None, 50)
     text2 = f2.render('Plese, enter your nickname:', True, (180, 0, 0))
     screen.blit(text2, (400 , 400))
@@ -157,27 +160,23 @@ while not FINISHED:
                 number_of_symbol = number_of_symbol + 1
                 text1 = f1.render(keyname, True, (180, 0, 0))
                 screen.blit(text1, (400 + number_of_symbol * 30, 450))
-
-
-
 if number_of_enter == 2:
     FINISHED = False
-
-
 
 list_of_balls = []
 score = 0
 number_of_while = 0
 
 while not FINISHED:
-    number_of_while = number_of_while + 1
-
+    """
+    The main cycle of the game
+    """
     clock.tick(FPS)
+    number_of_while = number_of_while + 1
 
     if number_of_while % 30 == 0 or number_of_while == 0:
         list_of_balls.append(Ball())
     
-
     for i in range(len(list_of_balls)):
         list_of_balls[i].moving()
         list_of_balls[i].draw()
@@ -217,6 +216,9 @@ while not FINISHED:
     screen.fill(BLACK)
 
 if score > data[nickname]:
+    """
+    Congratulations to the player if he make the record
+    """
     screen.fill(BLACK)
     data[nickname] = score
     with open ('input.json', 'w') as f:
