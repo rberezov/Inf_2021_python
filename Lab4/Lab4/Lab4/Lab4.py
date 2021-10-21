@@ -1,5 +1,5 @@
 import linecache
-import json 
+import json
 from math import sqrt
 from random import randint
 import pygame
@@ -27,34 +27,35 @@ class Ball:
     x, y, r  - Coordinates of the center of the ball and radius
     v - Speed
     """
+    max_radius = 99
+    min_radius = 30
     def __init__(self):
-        self.max_r = 99
         self.number_of_clicks_to_delete = randint(1, 5)
         self.lives = randint(500, 1000)
-        self.x = randint(200, 1000)
-        self.y = randint(200, 800)
-        self.r = randint(30, self.max_r)
+        self.x_coordinate = randint(200, 1000)
+        self.y_coordinate = randint(200, 800)
+        self.radius = randint(self.min_radius, self.max_radius)
         self.color = COLORS[randint(0, 5)]
-        self.v = (randint(-6, 6), randint(-6, 6))
+        self.velocity = (randint(-6, 6), randint(-6, 6))
 
     def moving(self):
         """
         Moving the ball
         """
-        self.x = self.x + self.v[0]
-        self.y = self.y + self.v[1]
-        if self.x > 1200 - self.r or self.x - self.r < 0:
-            vx, vy = self.v
-            self.v = -vx, vy
-        if self.y > 900  - self.r or self.y  - self.r < 0:
-            vx, vy = self.v
-            self.v = vx, -vy
+        self.x_coordinate = self.x_coordinate + self.velocity[0]
+        self.y_coordinate = self.y_coordinate + self.velocity[1]
+        if self.x_coordinate > 1200 - self.radius or self.x_coordinate - self.radius < 0:
+            velocityx, velocityy = self.velocity
+            self.velocity = -velocityx, velocityy
+        if self.y_coordinate > 900  - self.radius or self.y_coordinate  - self.radius < 0:
+            velocityx, velocityy = self.velocity
+            self.velocity = velocityx, -velocityy
 
     def draw(self):
         """
         A ball is being drawn
         """
-        circle(screen, self.color, (self.x, self.y), self.r)
+        circle(screen, self.color, (self.x_coordinate, self.y_coordinate), self.radius)
 
     def delete(self):
         """
@@ -84,40 +85,37 @@ def number(num):
         for j in range(len(font_information)):
             if font_information[j] == '(':
                 j = j + 1
-                x = 0
-                y = 0
+                x_coordinate = 0
+                y_coordinate = 0
                 while font_information[j] != ',':
-                    x = x * 10 + ord(font_information[j]) - ord('0')
+                    x_coordinate = x_coordinate * 10 + ord(font_information[j]) - ord('0')
                     j = j + 1
-                numbe_of_numbers_read = numbe_of_numbers_read + 1 
+                numbe_of_numbers_read = numbe_of_numbers_read + 1
                 j = j + 1
                 while font_information[j] != ')':
-                    y = y * 10 + ord(font_information[j]) - ord('0')
+                    y_coordinate = y_coordinate * 10 + ord(font_information[j]) - ord('0')
                     j = j + 1
                 numbe_of_numbers_read = numbe_of_numbers_read + 1
                 if numbe_of_numbers_read == 2:
-                    tempx = tempx + x
-                    tempy = tempy - y
+                    tempx = tempx + x_coordinate
+                    tempy = tempy - y_coordinate
                 else:
                     line(screen, (255, 255, 255), (tempx, tempy),
-                        (posx + x, posy - y), 10)
-                    tempx = posx + x
-                    tempy = posy - y  
+                        (posx + x_coordinate, posy - y_coordinate), 10)
+                    tempx = posx + x_coordinate
+                    tempy = posy - y_coordinate
 pygame.display.update()
 clock = pygame.time.Clock()
 
 data = {}
-with open ('input.json', 'r') as f:
+with open ('input.json', 'rt') as f:
     data = json.load(f)
 
 FINISHED = False
-nickname = ''
+NICKNAME = ''
 number_of_symbol = 0
 number_of_enter = 0
-while not FINISHED:
-    """
-    Entering the user name
-    """
+while not FINISHED: #Entering the user name
     f2 = pygame.font.Font(None, 50)
     text2 = f2.render('Plese, enter your nickname:', True, (180, 0, 0))
     screen.blit(text2, (400 , 400))
@@ -130,9 +128,9 @@ while not FINISHED:
                 FINISHED = True
             elif pygame.key.name(event.key) == 'return':
                 if number_of_enter == 0:
-                    if data.get(nickname) == None:
-                        data[nickname] = 0
-                    text3 = f2.render('Your record:' + str(data[nickname]),
+                    if data.get(NICKNAME) is None:
+                        data[NICKNAME] = 0
+                    text3 = f2.render('Your record:' + str(data[NICKNAME]),
                                      True, (180, 0, 0))
                     screen.blit(text3, (400, 500))
                     number_of_enter = number_of_enter + 1
@@ -141,17 +139,18 @@ while not FINISHED:
                     FINISHED = True
             elif pygame.key.name(event.key) == 'space':
                 number_of_symbol = number_of_symbol + 1
-                nickname = nickname + ' '
-            elif pygame.key.name(event.key) == 'left shift' or pygame.key.name(event.key) == 'right shift':
-                nickname = nickname + ''
+                NICKNAME = NICKNAME + ' '
+            elif pygame.key.name(event.key) == 'left shift' \
+               or pygame.key.name(event.key) == 'right shift':
+                NICKNAME = NICKNAME + ''
             elif pygame.key.name(event.key) == 'backspace':
                 if number_of_symbol != 0 and number_of_enter == 0:
-                    nickname = nickname[:-1]
+                    NICKNAME = NICKNAME[:-1]
                     number_of_symbol = number_of_symbol - 1
                     rect(screen, (0, 0, 0), (430 + number_of_symbol * 30, 450, 50, 50))
             else:
                 keyname = pygame.key.name(event.key)
-                nickname = nickname + keyname
+                NICKNAME = NICKNAME + keyname
                 f1 = pygame.font.Font(None, 50)
                 number_of_symbol = number_of_symbol + 1
                 text1 = f1.render(keyname, True, (180, 0, 0))
@@ -163,24 +162,18 @@ list_of_balls = []
 score = 0
 number_of_while = 0
 
-while not FINISHED:
-    """
-    The main cycle of the game
-    """
+while not FINISHED: #The main cycle of the game
     clock.tick(FPS)
     number_of_while = number_of_while + 1
 
     if number_of_while % 30 == 0 or number_of_while == 0:
         list_of_balls.append(Ball())
-    
     for i in range(len(list_of_balls)):
         list_of_balls[i].moving()
         list_of_balls[i].draw()
 
     number(score)
-
     pygame.display.update()
-    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             FINISHED = True
@@ -190,13 +183,20 @@ while not FINISHED:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             the_number_of_balls_hit = 0
             for i in reversed(range(len(list_of_balls))):
-                if (event.pos[0] - list_of_balls[i].x) ** 2 + (event.pos[1] - list_of_balls[i].y) ** 2 < list_of_balls[i].r ** 2:
+                if (event.pos[0] - list_of_balls[i].x_coordinate) ** 2 \
+                    + (event.pos[1] - list_of_balls[i].y_coordinate) ** 2 \
+                    < list_of_balls[i].radius ** 2:
                     the_number_of_balls_hit = the_number_of_balls_hit + 1
                     if list_of_balls[i].number_of_clicks_to_delete - 1 > 0:
-                        list_of_balls[i].number_of_clicks_to_delete = list_of_balls[i].number_of_clicks_to_delete - 1
+                        list_of_balls[i].number_of_clicks_to_delete = \
+                            list_of_balls[i].number_of_clicks_to_delete - 1
                     else:
                         list_of_balls[i].delete()
-                        score = score + list_of_balls[i].max_r // list_of_balls[i].r + round(sqrt(list_of_balls[i].v[1] ** 2 + list_of_balls[i].v[1] ** 2)) // 3 + list_of_balls[i].number_of_clicks_to_delete // 2
+                        score = score + list_of_balls[i].max_radius \
+                            // list_of_balls[i].radius \
+                            + round(sqrt(list_of_balls[i].velocity[1] ** 2 \
+                           + list_of_balls[i].velocity[1] ** 2)) // 3 \
+                           + list_of_balls[i].number_of_clicks_to_delete // 2
                         list_of_balls.pop(i)
             if the_number_of_balls_hit == 0 and score != 0:
                 score = score - 1
@@ -211,13 +211,10 @@ while not FINISHED:
 
     screen.fill(BLACK)
 
-if score > data[nickname]:
-    """
-    Congratulations to the player if he make the record
-    """
+if score > data[NICKNAME]: #Congratulations to the player if he make the record
     screen.fill(BLACK)
-    data[nickname] = score
-    with open ('input.json', 'w') as f:
+    data[NICKNAME] = score
+    with open ('input.json', 'wt') as f:
         json.dump(data, f)
     finished = False
     while not finished:
@@ -232,5 +229,4 @@ if score > data[nickname]:
                          True, (180, 0, 0))
         screen.blit(text4, (350 , 400))
         pygame.display.update()
-        
 pygame.quit()
