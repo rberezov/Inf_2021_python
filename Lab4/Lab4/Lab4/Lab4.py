@@ -60,7 +60,7 @@ class Ball:
         """
         self.color = BLACK
 
-def number(num):
+def number(num, posx_0, posy_0, size):
     """
     Displays the score in the game on the screen
     """
@@ -73,10 +73,9 @@ def number(num):
 
     for k in reversed(range(len(numbers))):
         font_information = linecache.getline('num.txt', numbers[k] + 1)
-        posx = LENGHT - 100 - 120 * k
-        posy = 150
+        posx = posx_0 - 120 * size / 50 * k
         tempx = posx
-        tempy = posy
+        tempy = posy_0
         numbe_of_numbers_read = 0
 
         for j in range(len(font_information)):
@@ -94,13 +93,14 @@ def number(num):
                     j = j + 1
                 numbe_of_numbers_read = numbe_of_numbers_read + 1
                 if numbe_of_numbers_read == 2:
-                    tempx = tempx + x_coordinate
-                    tempy = tempy - y_coordinate
+                    tempx = tempx + size / 50 * x_coordinate
+                    tempy = tempy - size / 50 * y_coordinate
                 else:
                     pygame.draw.line(screen, (255, 255, 255), (tempx, tempy),
-                        (posx + x_coordinate, posy - y_coordinate), 10)
-                    tempx = posx + x_coordinate
-                    tempy = posy - y_coordinate
+                        (posx + size / 50 * x_coordinate, posy_0 - size / 50 * y_coordinate),
+                       size * 10 // 50)
+                    tempx = posx + size * x_coordinate // 50
+                    tempy = posy_0 - size / 50 * y_coordinate
 pygame.display.update()
 clock = pygame.time.Clock()
 
@@ -169,8 +169,12 @@ while not FINISHED: #The main cycle of the game
     for i in range(len(LIST_OF_BALLS)):
         LIST_OF_BALLS[i].moving()
         LIST_OF_BALLS[i].draw()
+        number(LIST_OF_BALLS[i].number_of_clicks_to_delete, \
+            LIST_OF_BALLS[i].x_coordinate - LIST_OF_BALLS[i].radius // 4,
+            LIST_OF_BALLS[i].y_coordinate + LIST_OF_BALLS[i].radius // 2,
+            50 * LIST_OF_BALLS[i].radius // LIST_OF_BALLS[i].max_radius)
 
-    number(SCORE)
+    number(SCORE, LENGHT - 100, 150, 50)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
