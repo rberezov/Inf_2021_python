@@ -1,8 +1,10 @@
 import linecache
 import json
+import time
 from math import sqrt
 from random import randint
 import pygame
+from pygame.constants import *
 pygame.init()
 
 FPS = 90
@@ -24,32 +26,28 @@ class Ball:
     number_of_clicks_to_delete - Number of taps to remove the ball
     lives - Number of lives
     """
-    max_radius = 99
-    min_radius = 30
     def __init__(self):
         self.number_of_clicks_to_delete = randint(1, 5)
-        self.lives = randint(500, 1000)
+        self.lives = 150
         self.x_coordinate = 100
-        self.y_coordinate = 100
-        self.radius = randint(self.min_radius, self.max_radius)
+        self.y_coordinate = 800
+        self.radius = 20
         self.color = COLORS[randint(0, 5)]
-        self.velocity = (randint(-6, 6), randint(-6, 6))
+        self.velocityx = 0
+        self.velocityy = 0
         self.Birth = 0
 
     def moving(self, t):
         """
         Moving the ball
         """
-        velocityx, velocityy = self.velocity
-        self.velocity = velocityx, velocityy + 0.0005 * (t - self.Birth)
-        self.x_coordinate = self.x_coordinate + self.velocity[0] 
-        self.y_coordinate = self.y_coordinate + self.velocity[1]
+        self.velocityy = self.velocityy + 0.005 * (t - self.Birth)
+        self.x_coordinate = self.x_coordinate + self.velocityx 
+        self.y_coordinate = self.y_coordinate + self.velocityy
         if self.x_coordinate > 1200 - self.radius or self.x_coordinate - self.radius < 0:
-            velocityx, velocityy = self.velocity
-            self.velocity = -velocityx, velocityy
+            self.velocityx = -self.velocityx
         if self.y_coordinate > 900 - self.radius or self.y_coordinate  - self.radius < 0:
-            velocityx, velocityy = self.velocity
-            self.velocity = velocityx, -velocityy
+            self.velocityy = -self.velocityy
             if self.y_coordinate > 900 - self.radius:
                 self.y_coordinate = 900  - self.radius
 
@@ -64,6 +62,27 @@ class Ball:
         The ball is painted black before being removed
         """
         self.color = BLACK
+
+class gun:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+
+    def draw(self, t):
+        if (self.x - 100) ** 2 + (self.y - 800) ** 2 != 0:
+            pygame.draw.line(screen,YELLOW ,(100 - (self.x - 100) * t / sqrt((self.x - 100) ** 2 \
+                + (self.y - 800) ** 2), 800 + (800 - self.y) * t / sqrt((self.x - 100) ** 2 \
+                + (self.y - 800) ** 2)), (100, 800), 20)
+
+class aim:
+    def __init__(self):
+        self.object_ball = Ball()
+        self.object_ball.x_coordinate = randint(400, 1000)
+        self.object_ball.y_coordinate = randint(100, 700)
+        self.object_ball.radius = 20
+
+    def draw(self):
+        self.object_ball.draw()
 
 def number(num, posx_0, posy_0, size):
     """
@@ -164,51 +183,48 @@ if NUMBER_OF_ENTER == 2: #Checks whether the player has exited
 LIST_OF_BALLS = []
 SCORE = 0
 NUMBER_OF_EXECUTIONS_MAIN_CYCLES = 0
-
+Time_of_pressing_the_key = 0
+Number_of_cycles_before_releasing_the_key = 0
+The_number_of_shots_before_hitting = 0
+sh = gun()
+ai = aim()
 while not FINISHED: #The main cycle of the game
     clock.tick(FPS)
+    ai.draw()
     NUMBER_OF_EXECUTIONS_MAIN_CYCLES = NUMBER_OF_EXECUTIONS_MAIN_CYCLES + 1
-
-    if NUMBER_OF_EXECUTIONS_MAIN_CYCLES % 30 == 0 or NUMBER_OF_EXECUTIONS_MAIN_CYCLES == 0:
-        LIST_OF_BALLS.append(Ball())
-        LIST_OF_BALLS[-1].Birth = NUMBER_OF_EXECUTIONS_MAIN_CYCLES
+    if Number_of_cycles_before_releasing_the_key < 100:
+        Number_of_cycles_before_releasing_the_key = Number_of_cycles_before_releasing_the_key + 1
     for i in range(len(LIST_OF_BALLS)):
         LIST_OF_BALLS[i].moving(NUMBER_OF_EXECUTIONS_MAIN_CYCLES)
         LIST_OF_BALLS[i].draw()
-        number(LIST_OF_BALLS[i].number_of_clicks_to_delete, \
-            LIST_OF_BALLS[i].x_coordinate - LIST_OF_BALLS[i].radius // 4,
-            LIST_OF_BALLS[i].y_coordinate + LIST_OF_BALLS[i].radius // 2,
-            50 * LIST_OF_BALLS[i].radius // LIST_OF_BALLS[i].max_radius)
-
     number(SCORE, LENGHT - 100, 150, 50)
+    if Time_of_pressing_the_key != 0:
+        sh.draw(25 + Number_of_cycles_before_releasing_the_key)
+    else:
+        sh.draw(25)
     pygame.display.update()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            FINISHED = True
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            Time_of_pressing_the_key = 0.04
+            Number_of_cycles_before_releasing_the_key = 0
+            The_number_of_shots_before_hitting = The_number_of_shots_before_hitting + 1
+        elif event.type == pygame.MOUSEMOTION:
+            sh.x = event.pos[0]
+            sh.y = event.pos[1]
         elif event.type == pygame.KEYDOWN:
             if pygame.key.name(event.key) == 'escape':
                 FINISHED = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            THE_NUMBER_OF_BALLS_HIT = 0
-            for i in reversed(range(len(LIST_OF_BALLS))):
-                if (event.pos[0] - LIST_OF_BALLS[i].x_coordinate) ** 2 \
-                    + (event.pos[1] - LIST_OF_BALLS[i].y_coordinate) ** 2 \
-                    < LIST_OF_BALLS[i].radius ** 2:
-                    THE_NUMBER_OF_BALLS_HIT = THE_NUMBER_OF_BALLS_HIT + 1
-                    if LIST_OF_BALLS[i].number_of_clicks_to_delete - 1 > 0:
-                        LIST_OF_BALLS[i].number_of_clicks_to_delete = \
-                            LIST_OF_BALLS[i].number_of_clicks_to_delete - 1
-                    else:
-                        LIST_OF_BALLS[i].delete()
-                        SCORE = SCORE + LIST_OF_BALLS[i].max_radius \
-                            // LIST_OF_BALLS[i].radius \
-                            + round(sqrt(LIST_OF_BALLS[i].velocity[1] ** 2 \
-                           + LIST_OF_BALLS[i].velocity[1] ** 2)) // 3 \
-                           + LIST_OF_BALLS[i].number_of_clicks_to_delete // 2
-                        LIST_OF_BALLS.pop(i)
-            if THE_NUMBER_OF_BALLS_HIT == 0 and SCORE != 0:
-                SCORE = SCORE - 1
-
+        elif event.type == pygame.QUIT:
+            FINISHED = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            x = Ball()
+            x.Birth = NUMBER_OF_EXECUTIONS_MAIN_CYCLES
+            x.velocityx = (event.pos[0] - 100) / sqrt((event.pos[0] + 100) ** 2 + (event.pos[1] - 800) ** 2)\
+               * Time_of_pressing_the_key * Number_of_cycles_before_releasing_the_key * 5
+            x.velocityy = (event.pos[1] - 800) / sqrt((event.pos[0] + 100) ** 2 + (event.pos[1] - 800) ** 2)\
+               * Time_of_pressing_the_key * Number_of_cycles_before_releasing_the_key * 5
+            LIST_OF_BALLS.append(x)
+            Time_of_pressing_the_key = 0
 
     for i in reversed(range(len(LIST_OF_BALLS))):
         if LIST_OF_BALLS[i].lives - 1 >= 0:
@@ -216,6 +232,25 @@ while not FINISHED: #The main cycle of the game
         else:
             LIST_OF_BALLS[i].delete()
             LIST_OF_BALLS.pop(i)
+
+    for i in reversed(range(len(LIST_OF_BALLS))):
+        if (LIST_OF_BALLS[i].x_coordinate - ai.object_ball.x_coordinate) ** 2 \
+            + (LIST_OF_BALLS[i].y_coordinate - ai.object_ball.y_coordinate) ** 2 \
+            < (ai.object_ball.radius + LIST_OF_BALLS[i].radius) ** 2:
+            screen.fill(BLACK)
+            temp = time.time()
+            while time.time() - temp < 1: {}
+            SCORE = SCORE + 1
+            f4 = pygame.font.Font(None, 50)
+            text4 = f4.render('You took ' + str(The_number_of_shots_before_hitting) +' shots to hit!'\
+            , True, (180, 0, 0))
+            temp = time.time()
+            while (time.time() - temp < 2):
+                screen.blit(text4, (350 , 400))
+                pygame.display.update()
+            The_number_of_shots_before_hitting = 0
+            ai = aim()
+            LIST_OF_BALLS = []
 
     screen.fill(BLACK)
 
@@ -238,4 +273,3 @@ if SCORE > data[NICKNAME]: #Congratulations to the player if he make the record
         screen.blit(text4, (350 , 400))
         pygame.display.update()
 pygame.quit()
-
