@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "5a68010c-4111-49c8-9be9-0b528446d260": {
+      "ProjectGuid": "5a68010c-4111-49c8-9be9-0b528446d260",
+      "DisplayName": "Gun",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}
