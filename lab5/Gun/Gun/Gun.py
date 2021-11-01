@@ -35,14 +35,14 @@ class Ball:
         self.color = COLORS[randint(0, 5)]
         self.velocityx = 0
         self.velocityy = 0
-        self.Birth = 0
+        self.birth = 0
 
-    def moving(self, t):
+    def moving(self, time):
         """
         Moving the ball
         """
-        self.velocityy = self.velocityy + 0.005 * (t - self.Birth)
-        self.x_coordinate = self.x_coordinate + self.velocityx 
+        self.velocityy = self.velocityy + 0.005 * (time - self.birth)
+        self.x_coordinate = self.x_coordinate + self.velocityx
         self.y_coordinate = self.y_coordinate + self.velocityy
         if self.x_coordinate > 1200 - self.radius or self.x_coordinate - self.radius < 0:
             self.velocityx = -self.velocityx
@@ -64,24 +64,31 @@ class Ball:
         self.color = BLACK
 
 class gun:
+    """
+    Creates a cannon
+    x, y - mouse coordinates
+    """
     def __init__(self):
         self.x = 0
         self.y = 0
 
-    def draw(self, t):
+    def draw(self, t): # Draw a cannon
         if (self.x - 100) ** 2 + (self.y - 800) ** 2 != 0:
             pygame.draw.line(screen,YELLOW ,(100 - (self.x - 100) * t / sqrt((self.x - 100) ** 2 \
                 + (self.y - 800) ** 2), 800 + (800 - self.y) * t / sqrt((self.x - 100) ** 2 \
                 + (self.y - 800) ** 2)), (100, 800), 20)
 
 class aim:
+    """
+    Creates a aim using class Ball
+    """
     def __init__(self):
         self.object_ball = Ball()
         self.object_ball.x_coordinate = randint(400, 1000)
         self.object_ball.y_coordinate = randint(100, 700)
         self.object_ball.radius = 20
 
-    def draw(self):
+    def draw(self): # Draw a aim
         self.object_ball.draw()
 
 def number(num, posx_0, posy_0, size):
@@ -183,31 +190,31 @@ if NUMBER_OF_ENTER == 2: #Checks whether the player has exited
 LIST_OF_BALLS = []
 SCORE = 0
 NUMBER_OF_EXECUTIONS_MAIN_CYCLES = 0
-Time_of_pressing_the_key = 0
-Number_of_cycles_before_releasing_the_key = 0
-The_number_of_shots_before_hitting = 0
+TIME_OF_PRESSING_THE_KEY = 0
+NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY = 0
+THE_NUMBER_OF_SHOTS_BEFORE_HITTING = 0
 sh = gun()
 ai = aim()
 while not FINISHED: #The main cycle of the game
     clock.tick(FPS)
     ai.draw()
     NUMBER_OF_EXECUTIONS_MAIN_CYCLES = NUMBER_OF_EXECUTIONS_MAIN_CYCLES + 1
-    if Number_of_cycles_before_releasing_the_key < 100:
-        Number_of_cycles_before_releasing_the_key = Number_of_cycles_before_releasing_the_key + 1
+    if NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY < 100:
+        NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY = NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY + 1
     for i in range(len(LIST_OF_BALLS)):
         LIST_OF_BALLS[i].moving(NUMBER_OF_EXECUTIONS_MAIN_CYCLES)
         LIST_OF_BALLS[i].draw()
     number(SCORE, LENGHT - 100, 150, 50)
-    if Time_of_pressing_the_key != 0:
-        sh.draw(25 + Number_of_cycles_before_releasing_the_key)
+    if TIME_OF_PRESSING_THE_KEY != 0:
+        sh.draw(25 + NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY)
     else:
         sh.draw(25)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
-            Time_of_pressing_the_key = 0.04
-            Number_of_cycles_before_releasing_the_key = 0
-            The_number_of_shots_before_hitting = The_number_of_shots_before_hitting + 1
+            TIME_OF_PRESSING_THE_KEY = 0.04
+            NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY = 0
+            THE_NUMBER_OF_SHOTS_BEFORE_HITTING = THE_NUMBER_OF_SHOTS_BEFORE_HITTING + 1
         elif event.type == pygame.MOUSEMOTION:
             sh.x = event.pos[0]
             sh.y = event.pos[1]
@@ -218,13 +225,15 @@ while not FINISHED: #The main cycle of the game
             FINISHED = True
         elif event.type == pygame.MOUSEBUTTONUP:
             x = Ball()
-            x.Birth = NUMBER_OF_EXECUTIONS_MAIN_CYCLES
-            x.velocityx = (event.pos[0] - 100) / sqrt((event.pos[0] + 100) ** 2 + (event.pos[1] - 800) ** 2)\
-               * Time_of_pressing_the_key * Number_of_cycles_before_releasing_the_key * 5
-            x.velocityy = (event.pos[1] - 800) / sqrt((event.pos[0] + 100) ** 2 + (event.pos[1] - 800) ** 2)\
-               * Time_of_pressing_the_key * Number_of_cycles_before_releasing_the_key * 5
+            x.birth = NUMBER_OF_EXECUTIONS_MAIN_CYCLES
+            x.velocityx = (event.pos[0] - 100) / sqrt((event.pos[0] + 100) ** 2 \
+               + (event.pos[1] - 800) ** 2) * TIME_OF_PRESSING_THE_KEY \
+               * NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY * 5
+            x.velocityy = (event.pos[1] - 800) / sqrt((event.pos[0] + 100) ** 2 \
+                + (event.pos[1] - 800) ** 2) * TIME_OF_PRESSING_THE_KEY \
+                * NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY * 5
             LIST_OF_BALLS.append(x)
-            Time_of_pressing_the_key = 0
+            TIME_OF_PRESSING_THE_KEY = 0
 
     for i in reversed(range(len(LIST_OF_BALLS))):
         if LIST_OF_BALLS[i].lives - 1 >= 0:
@@ -238,17 +247,15 @@ while not FINISHED: #The main cycle of the game
             + (LIST_OF_BALLS[i].y_coordinate - ai.object_ball.y_coordinate) ** 2 \
             < (ai.object_ball.radius + LIST_OF_BALLS[i].radius) ** 2:
             screen.fill(BLACK)
-            temp = time.time()
-            while time.time() - temp < 1: {}
             SCORE = SCORE + 1
             f4 = pygame.font.Font(None, 50)
-            text4 = f4.render('You took ' + str(The_number_of_shots_before_hitting) +' shots to hit!'\
-            , True, (180, 0, 0))
+            text4 = f4.render('You took ' + str(THE_NUMBER_OF_SHOTS_BEFORE_HITTING) \
+                +' shots to hit!', True, (180, 0, 0))
             temp = time.time()
             while (time.time() - temp < 2):
                 screen.blit(text4, (350 , 400))
                 pygame.display.update()
-            The_number_of_shots_before_hitting = 0
+            THE_NUMBER_OF_SHOTS_BEFORE_HITTING = 0
             ai = aim()
             LIST_OF_BALLS = []
 
