@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\lab5",
+    "\\lab5\\Gun",
+    "\\lab5\\Gun\\Gun"
   ],
+  "SelectedNode": "\\lab5\\Gun\\Gun\\Gun.py",
   "PreviewInSolutionExplorer": false
 }

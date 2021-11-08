@@ -226,10 +226,10 @@ while not FINISHED: #The main cycle of the game
         elif event.type == pygame.MOUSEBUTTONUP:
             x = Ball()
             x.birth = NUMBER_OF_EXECUTIONS_MAIN_CYCLES
-            x.velocityx = (event.pos[0] - 100) / sqrt((event.pos[0] + 100) ** 2 \
+            x.velocityx = (event.pos[0] - 100) / sqrt((event.pos[0] - 100) ** 2 \
                + (event.pos[1] - 800) ** 2) * TIME_OF_PRESSING_THE_KEY \
                * NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY * 5
-            x.velocityy = (event.pos[1] - 800) / sqrt((event.pos[0] + 100) ** 2 \
+            x.velocityy = (event.pos[1] - 800) / sqrt((event.pos[0] - 100) ** 2 \
                 + (event.pos[1] - 800) ** 2) * TIME_OF_PRESSING_THE_KEY \
                 * NUMBER_OF_CYCLES_BEFOR_RELEASING_THE_KEY * 5
             LIST_OF_BALLS.append(x)
@@ -246,18 +246,22 @@ while not FINISHED: #The main cycle of the game
         if (LIST_OF_BALLS[i].x_coordinate - ai.object_ball.x_coordinate) ** 2 \
             + (LIST_OF_BALLS[i].y_coordinate - ai.object_ball.y_coordinate) ** 2 \
             < (ai.object_ball.radius + LIST_OF_BALLS[i].radius) ** 2:
+            #screen.fill(BLACK)
+            SCORE = SCORE + 1
+            #f4 = pygame.font.Font(None, 50)
+            #text4 = f4.render('You took ' + str(THE_NUMBER_OF_SHOTS_BEFORE_HITTING) \
+            #    +' shots to hit!', True, (180, 0, 0))
+            #temp = time.time()
+            #while (time.time() - temp < 2):
+            #    screen.blit(text4, (350 , 400))
+            #    pygame.display.update()
+            #THE_NUMBER_OF_SHOTS_BEFORE_HITTING = 0
             screen.fill(BLACK)
             SCORE = SCORE + 1
-            f4 = pygame.font.Font(None, 50)
-            text4 = f4.render('You took ' + str(THE_NUMBER_OF_SHOTS_BEFORE_HITTING) \
-                +' shots to hit!', True, (180, 0, 0))
             temp = time.time()
-            while (time.time() - temp < 2):
-                screen.blit(text4, (350 , 400))
-                pygame.display.update()
             THE_NUMBER_OF_SHOTS_BEFORE_HITTING = 0
             ai = aim()
-            LIST_OF_BALLS = []
+            #LIST_OF_BALLS = []
 
     screen.fill(BLACK)
 
